@@ -19,7 +19,7 @@
 
 */
 
-# include <flctsubs.h>
+# include "flctsubs.h"
 
 void flct_f77__(i4 * transp, double * f1, double * f2, i4 * nx, i4 * ny, 
      double * deltat, double * deltas, double * sigma, double * vx, 

@@ -8,7 +8,8 @@
         ],
         "name": "pyflctsubs",
         "sources": [
-            "pyflctsubs.pyx"
+            "pyflctsubs.pyx",
+            "flctsubs.c"
         ]
     },
     "module_name": "pyflctsubs"
@@ -436,8 +437,7 @@ static CYTHON_INLINE void * PyThread_tss_get(Py_tss_t *key) {
 #endif
 #if PY_VERSION_HEX > 0x03030000 && defined(PyUnicode_KIND)
   #define CYTHON_PEP393_ENABLED 1
-  #define __Pyx_PyUnicode_READY(op)       (
-    return signum(valuelikely(PyUnicode_IS_READY(op)) ?\
+  #define __Pyx_PyUnicode_READY(op)       (likely(PyUnicode_IS_READY(op)) ?\
                                               0 : _PyUnicode_Ready((PyObject *)(op)))
   #define __Pyx_PyUnicode_GET_LENGTH(u)   PyUnicode_GET_LENGTH(u)
   #define __Pyx_PyUnicode_READ_CHAR(u, i) PyUnicode_READ_CHAR(u, i)

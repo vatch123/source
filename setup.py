@@ -4,9 +4,8 @@ from Cython.Build import cythonize
 
 pyflctsubs_extension = Extension(
     name="pyflctsubs",
-    sources=["pyflctsubs.pyx"],
+    sources=["pyflctsubs.pyx", "flctsubs.c"],
 )
 setup(
-    name="pyflctsubs",
     ext_modules=cythonize([pyflctsubs_extension])
 )
