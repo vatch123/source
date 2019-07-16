@@ -1,5 +1,7 @@
 import numpy as np
 cimport numpy as np
+from cython cimport view
+
 cdef extern from "flctsubs.h":
     void flct_f77__(int * transp, double * f1, double * f2, int * nx, int * ny,
         double * deltat, double * deltas, double * sigma, double * vx,
@@ -89,13 +91,23 @@ cdef extern from "flctsubs.h":
     void shift_frac2d_f77__(double *arr, double *delx, double *dely, double *outarr,
         int *nx, int *ny, int *transp, int *verbose)
 
-def read_to_images(file_name, nx, ny, arr, barr, transpose=0):
-    cdef np.ndarray[int, ndim=1, mode="c"] nx_c = np.asarray(nx, dtype = int, order="C")
-    cdef np.ndarray[int, ndim=1, mode="c"] ny_c = np.asarray(ny, dtype = int, order="C")
-    cdef np.ndarray[double, ndim=2, mode="c"] arr_c = np.asarray(arr, dtype = float, order="C")
-    cdef np.ndarray[double, ndim=2, mode="c"] barr_c = np.asarray(barr, dtype = float, order="C")
+np.import_array()
+cdef extern from "numpy/arrayobject.h":
+    void PyArray_ENABLEFLAGS(np.ndarray arr, int flags)
+
+def read_to_images(file_name, transpose=0):
+
+    cdef int nx
+    cdef int ny
+    cdef double *arr
+    cdef double *barr
     
-    return read2images(file_name, <int *> nx_c.data, <int *> ny_c.data, <double **> arr_c.data, <double **> barr_c.data, transpose)
+    ier = read2images(file_name, &nx, &ny, &arr, &barr, transpose)
+
+    cdef view.array cy_arr = <double[:nx, :ny]> arr
+    cdef view.array cy_barr = <double[:nx, :ny]> barr
+
+    return (ier, nx, ny, cy_arr, cy_barr)
 
 
 def write_3_images(file_name, arr, barr, carr, nx, ny, transpose):
@@ -103,7 +115,7 @@ def write_3_images(file_name, arr, barr, carr, nx, ny, transpose):
     cdef np.ndarray[double, ndim=1, mode="c"] barr_c = np.asarray(barr, dtype = float, order="C")
     cdef np.ndarray[double, ndim=1, mode="c"] carr_c = np.asarray(carr, dtype = float, order="C")
 
-    return write3images(file_name, <double *> arr_c.data, <double *> barr_c.data, <double *> carr_c.data, nx, ny, transpose)
+    ier = write3images(file_name, <double *> arr_c.data, <double *> barr_c.data, <double *> carr_c.data, nx, ny, transpose)
 
 
 def sign(value):
@@ -124,15 +136,17 @@ def pyflct_plate_carree(transpose, f1, f2, nxorig, nyorig, deltat, deltas, sigma
     cdef np.ndarray[double, ndim=1, mode="c"] vy_c = np.asarray(vy, dtype = float, order="C")
     cdef np.ndarray[double, ndim=1, mode="c"] vm_c = np.asarray(vm, dtype = float, order="C")
 
-    return flct_pc(transpose, <double *> f1_c.data, <double *> f2_c.data, nxorig, nyorig, deltat,
-                   deltas, sigma, <double *> vx_c.data, <double *> vy_c.data, <double *> vm_c.data,
-                   thresh, absflag, filter, kr, skip, poffset, qoffset, interpolate, latmin, latmax,
-                   biascor, verbose)
+    ierflct = flct_pc(transpose, <double *> f1_c.data, <double *> f2_c.data, nxorig, nyorig, deltat,
+                      deltas, sigma, <double *> vx_c.data, <double *> vy_c.data, <double *> vm_c.data,
+                      thresh, absflag, filter, kr, skip, poffset, qoffset, interpolate, latmin, latmax,
+                      biascor, verbose)
+    
+    return ierflct, vx_c, vy_c, vm_c
 
 
 def pyflct(transpose, f1, f2, nxorig, nyorig, deltat, deltas, sigma, 
-                      vx, vy, vm, thresh, absflag, filter, kr, skip, poffset,
-                      qoffset, interpolate, latmin, latmax, biascor, verbose
+                      vx, vy, vm, thresh, absflag, filter, kr, skip,
+                      poffset, qoffset, interpolate, biascor, verbose
 ):
     cdef np.ndarray[double, ndim=1, mode="c"] f1_c = np.asarray(f1, dtype = float, order="C")
     cdef np.ndarray[double, ndim=1, mode="c"] f2_c = np.asarray(f2, dtype = float, order="C")
@@ -140,6 +154,8 @@ def pyflct(transpose, f1, f2, nxorig, nyorig, deltat, deltas, sigma,
     cdef np.ndarray[double, ndim=1, mode="c"] vy_c = np.asarray(vy, dtype = float, order="C")
     cdef np.ndarray[double, ndim=1, mode="c"] vm_c = np.asarray(vm, dtype = float, order="C")
 
-    return flct(transpose, <double *> f1_c.data, <double *> f2_c.data, nxorig, nyorig, deltat,
-                deltas, sigma, <double *> vx_c.data, <double *> vy_c.data, <double *> vm_c.data,
-                thresh, absflag, filter, kr, skip, poffset, qoffset, interpolate, biascor, verbose)
+    ierflct = flct(transpose, <double *> f1_c.data, <double *> f2_c.data, nxorig, nyorig, deltat,
+                   deltas, sigma, <double *> vx_c.data, <double *> vy_c.data, <double *> vm_c.data,
+                   thresh, absflag, filter, kr, skip, poffset, qoffset, interpolate, biascor, verbose)
+    
+    return ierflct, vx_c, vy_c, vm_c
