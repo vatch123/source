@@ -17,9 +17,24 @@ def flct(infile, outfile, deltat, deltas, sigma, quiet=False,
          ):
 
     if quiet is True:
-        verbose = False
+        verbose = 0
     else:
-        verbose = True
+        verbose = 1
+
+    if biascor is False:
+        biascor = 0
+    else:
+        biascor = 1
+
+    if absflag is False:
+        absflag = 0
+    else:
+        absflag = 1
+
+    if interp is False:
+        interp = 0
+    else:
+        interp = 1
 
     if skip is not None:
         if skip <= 0:
@@ -28,6 +43,8 @@ def flct(infile, outfile, deltat, deltas, sigma, quiet=False,
 
         if math.abs(poff) >= skip or math.abs(qoff) >= skip:
             raise ValueError("The absolute value of poff and qoff must be less than skip")
+    else:
+        skip = 0
 
     if kr is not None:
         if kr <= 0. or kr >= 20.:
@@ -38,6 +55,9 @@ def flct(infile, outfile, deltat, deltas, sigma, quiet=False,
 
     ier, nx, ny, f1, f2 = read_to_images(infile, 0)
 
+    f1 = np.array(f1)
+    f2 = np.array(f2)
+
     nxorig = nx
     nyorig = ny
 
@@ -45,8 +65,9 @@ def flct(infile, outfile, deltat, deltas, sigma, quiet=False,
         nx = 1
         ny = 1
 
-    if skip >= nx or skip >= ny:
-        raise ValueError("Skip is greater than the input dimensions")
+    if skip is not None:
+        if skip >= nx or skip >= ny:
+            raise ValueError("Skip is greater than the input dimensions")
 
     transp = 1
 
