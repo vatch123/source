@@ -118,10 +118,6 @@ def write_3_images(file_name, arr, barr, carr, nx, ny, transpose):
     ier = write3images(file_name, <double *> arr_c.data, <double *> barr_c.data, <double *> carr_c.data, nx, ny, transpose)
 
 
-def sign(value):
-    return signum(value)
-
-
 def endian():
     return is_large_endian ()
 
