@@ -175,9 +175,14 @@ def flct(infile, outfile, deltat, deltas, sigma, quiet=False,
     vm = np.zeros((nx * ny,), dtype=float)
 
     print("All inputs")
-    print(transp, f1, f2, nxorig, nyorig, deltat, deltas, sigma,
-                                           vx, vy, vm, thresh, absflag, filter, kr, skip, poff,
-                                           qoff, interp, biascor, verbose)
+    print(transp)
+    print(f1)
+    print(f2)
+    print(nxorig, nyorig,
+          deltat, deltas, sigma, vx, vy,
+          vm, thresh, absflag, filter, kr,
+          skip, poff, qoff, interp, latmin,
+          latmax, biascor, verbose)
 
     if pc is True:
         ierflct, vx_c, vy_c, vm_c = pyflct_plate_carree(transp, f1, f2, nxorig, nyorig, deltat,
