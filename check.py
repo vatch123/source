@@ -6,4 +6,4 @@ print(vx.reshape((201, 101)))
 
 orig = np.array(pd.read_csv('testgauss_vx.csv', header=None))
 
-assert np.allclose(orig, vx.reshape((201, 101)))
+assert np.allclose(orig, vx.reshape((101, 201)))
