@@ -122,10 +122,10 @@ def flct(infile, outfile, deltat, deltas, sigma, quiet=False,
     else:
         biascor = 1
 
-    if thresh != 0.0:
-        absflag = 1
-    else:
+    if absflag is False:
         absflag = 0
+    else:
+        absflag = 1
 
     if interp is False:
         interp = 0
@@ -150,6 +150,11 @@ def flct(infile, outfile, deltat, deltas, sigma, quiet=False,
     else:
         kr = 0.
         filter = 0
+
+    if(poff < 0):
+        poff = skip - math.abs(poff)
+    if(qoff < 0):
+        qoff = skip - math.abs(qoff)
 
     ibe = endian()
 
