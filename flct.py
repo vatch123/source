@@ -122,10 +122,10 @@ def flct(infile, outfile, deltat, deltas, sigma, quiet=False,
     else:
         biascor = 1
 
-    if absflag is False:
-        absflag = 0
-    else:
+    if thresh != 0.0:
         absflag = 1
+    else:
+        absflag = 0
 
     if interp is False:
         interp = 0
@@ -141,6 +141,7 @@ def flct(infile, outfile, deltat, deltas, sigma, quiet=False,
             raise ValueError("The absolute value of poff and qoff must be less than skip")
     else:
         skip = 0
+        skipon = 0
 
     if kr is not None:
         if kr <= 0. or kr >= 20.:
